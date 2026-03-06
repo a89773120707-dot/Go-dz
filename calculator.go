@@ -97,7 +97,7 @@ func inputNum() []float64 {
 		}
 
 		parts := strings.FieldsFunc(input, func(r rune) bool {
-			return r == ',' || r == '.' || r == ' '
+			return r == ',' || r == ' '
 		})
 		numbers := make([]float64, 0, len(parts))
 

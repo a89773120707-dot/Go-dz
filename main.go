@@ -15,10 +15,10 @@ func main() {
 	for {
 		amount, from, to := readInput()
 
-		result := convert(amount, from, to)
+		result := converterMap(amount, from, to)
 		fmt.Printf("%.2f %s = %.2f %s\n", amount, from, result, to)
 
-		fmt.Println("--- Курсы валют ---")
+		fmt.Println("\n--- Курсы валют ---")
 		fmt.Printf("Курс USD -> EUR: %.2f\n", usdToEur)
 		fmt.Printf("Курс USD -> RUB: %.2f\n", usdToRub)
 		fmt.Println("-------------------")
@@ -33,6 +33,24 @@ func main() {
 
 	}
 }
+
+var converter = map[string]float64{
+	"usd": 1.0,
+	"eur": 0.84,
+	"rub": 76.75,
+}
+
+func converterMap(amount float64, from, to string) float64 {
+	converterFrom := converter[from]
+	converterTo := converter[to]
+
+	if converterFrom == 0 {
+		return 0
+	}
+
+	return amount * (converterTo / converterFrom)
+
+}
 func checkRepeat() bool {
 	var vibor string
 	fmt.Println("Хотите продолжить ? нажмите  (y/n): ")
@@ -43,35 +61,36 @@ func checkRepeat() bool {
 	}
 	return false
 }
-func convert(amount float64, from, to string) float64 {
 
-	switch from {
-	case "usd":
-		if to == "eur" {
-			return amount * usdToEur
-		}
-		if to == "rub" {
-			return amount * usdToRub
-		}
+// func convert(amount float64, from, to string) float64 {
 
-	case "eur":
-		if to == "usd" {
-			return amount / usdToEur
-		}
-		if to == "rub" {
-			return amount * (1 / usdToEur) * usdToRub
-		}
+// 	switch from {
+// 	case "usd":
+// 		if to == "eur" {
+// 			return amount * usdToEur
+// 		}
+// 		if to == "rub" {
+// 			return amount * usdToRub
+// 		}
 
-	case "rub":
-		if to == "usd" {
-			return amount / usdToRub
-		}
-		if to == "eur" {
-			return amount / ((1 / usdToEur) * usdToRub)
-		}
-	}
-	return 0
-}
+// 	case "eur":
+// 		if to == "usd" {
+// 			return amount / usdToEur
+// 		}
+// 		if to == "rub" {
+// 			return amount * (1 / usdToEur) * usdToRub
+// 		}
+
+// 	case "rub":
+// 		if to == "usd" {
+// 			return amount / usdToRub
+// 		}
+// 		if to == "eur" {
+// 			return amount / ((1 / usdToEur) * usdToRub)
+// 		}
+// 	}
+// 	return 0
+// }
 
 func readInput() (float64, string, string) {
 

@@ -12,18 +12,20 @@ const (
 )
 
 func main() {
+	converter := map[string]float64{
+		"usd": 1.0,
+		"eur": 0.84,
+		"rub": 76.75,
+	}
+
 	for {
 		amount, from, to := readInput()
 
-		result := converterMap(amount, from, to)
-		fmt.Printf("%.2f %s = %.2f %s\n", amount, from, result, to)
+		result := converterMap(amount, from, to, &converter)
+		fmt.Println("ВАШ РАССЧЕТ: ")
+		fmt.Printf("\n%.2f %s = %.2f %s\n", amount, from, result, to)
 
-		fmt.Println("\n--- Курсы валют ---")
-		fmt.Printf("Курс USD -> EUR: %.2f\n", usdToEur)
-		fmt.Printf("Курс USD -> RUB: %.2f\n", usdToRub)
-		fmt.Println("-------------------")
-		fmt.Printf("Рассчитанный курс EUR -> RUB: %.2f\n", eurToRub)
-
+		showrates(&converter)
 		isCheckRepeat := checkRepeat()
 		if isCheckRepeat {
 			continue
@@ -33,16 +35,24 @@ func main() {
 
 	}
 }
-
-var converter = map[string]float64{
-	"usd": 1.0,
-	"eur": 0.84,
-	"rub": 76.75,
+func showrates(converter *map[string]float64) {
+	fmt.Println("\n--- Курсы валют ---")
+	fmt.Printf("Курс USD -> EUR: %.2f\n", usdToEur)
+	fmt.Printf("Курс USD -> RUB: %.2f\n", usdToRub)
+	fmt.Println("-------------------")
+	fmt.Printf("Рассчитанный курс EUR -> RUB: %.2f\n", eurToRub)
+	fmt.Println("-------------------")
+	fmt.Println("\n--- Текущие курсы ---")
+	for curr, rate := range *converter {
+		fmt.Printf("%s: %.2f\n", strings.ToUpper(curr), rate)
+	}
+	fmt.Println("-------------------")
 }
 
-func converterMap(amount float64, from, to string) float64 {
-	converterFrom := converter[from]
-	converterTo := converter[to]
+func converterMap(amount float64, from, to string, converter *map[string]float64) float64 {
+
+	converterFrom := (*converter)[from]
+	converterTo := (*converter)[to]
 
 	if converterFrom == 0 {
 		return 0
@@ -62,42 +72,11 @@ func checkRepeat() bool {
 	return false
 }
 
-// func convert(amount float64, from, to string) float64 {
-
-// 	switch from {
-// 	case "usd":
-// 		if to == "eur" {
-// 			return amount * usdToEur
-// 		}
-// 		if to == "rub" {
-// 			return amount * usdToRub
-// 		}
-
-// 	case "eur":
-// 		if to == "usd" {
-// 			return amount / usdToEur
-// 		}
-// 		if to == "rub" {
-// 			return amount * (1 / usdToEur) * usdToRub
-// 		}
-
-// 	case "rub":
-// 		if to == "usd" {
-// 			return amount / usdToRub
-// 		}
-// 		if to == "eur" {
-// 			return amount / ((1 / usdToEur) * usdToRub)
-// 		}
-// 	}
-// 	return 0
-// }
-
 func readInput() (float64, string, string) {
 
 	from := inputFrom()
 	amount := inputAmount()
 	to := inputTo(from)
-
 	return amount, from, to
 }
 

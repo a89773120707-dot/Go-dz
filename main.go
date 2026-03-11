@@ -46,7 +46,7 @@ func showrates(converter *map[string]float64) {
 	for curr, rate := range *converter {
 		fmt.Printf("%s: %.2f\n", strings.ToUpper(curr), rate)
 	}
-	fmt.Println("-------------------")
+
 }
 
 func converterMap(amount float64, from, to string, converter *map[string]float64) float64 {

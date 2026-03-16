@@ -1,3 +1,3 @@
-module 1_converter
+module 3-bin_manager
 
 go 1.25.5

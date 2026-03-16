@@ -1,7 +1,6 @@
-package main
+package bin
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -29,8 +28,4 @@ func NewBinList() *BinList {
 	return &BinList{
 		Bins: make([]Bin, 0),
 	}
-}
-func main() {
-	arr := NewBinList()
-	fmt.Println(arr)
 }

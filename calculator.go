@@ -12,9 +12,9 @@ import (
 func main() {
 	fmt.Println("=== Калькулятор Go v1.0 ===")
 	for {
-		operacion := inputOperacion()
+		operation := inputOperation()
 		number := inputNum()
-		result := calculator(operacion, number)
+		result := calculator(operation, number)
 		fmt.Println("Результат:", result)
 		if checkRepeat() {
 			continue
@@ -34,20 +34,20 @@ func checkRepeat() bool {
 	}
 	return true
 }
-func calculator(operacion string, number []float64) float64 {
-	var resault float64
+func calculator(operation string, number []float64) float64 {
+	var result float64
 	n := len(number)
-	switch operacion {
+	switch operation {
 	case "SUM":
 		for _, num := range number {
-			resault += num
+			result += num
 		}
-		return resault
+		return result
 	case "AVG":
 		for _, num := range number {
-			resault += num
+			result += num
 		}
-		return resault / float64(n)
+		return result / float64(n)
 	case "MED":
 		sort.Float64s(number)
 		if n%2 != 0 {
@@ -58,7 +58,7 @@ func calculator(operacion string, number []float64) float64 {
 	return 0
 }
 
-func inputOperacion() string {
+func inputOperation() string {
 
 	scanner := bufio.NewScanner(os.Stdin)
 
@@ -67,13 +67,13 @@ func inputOperacion() string {
 		fmt.Println("Введите операцию (SUM, AVG, MED):")
 		scanner.Scan()
 
-		operacion := strings.ToUpper(strings.TrimSpace(scanner.Text()))
+		operation := strings.ToUpper(strings.TrimSpace(scanner.Text()))
 
-		if operacion == "SUM" || operacion == "AVG" || operacion == "MED" {
-			return operacion
+		if operation == "SUM" || operation == "AVG" || operation == "MED" {
+			return operation
 		}
 
-		fmt.Printf("Ошибка: '%s' не поддерживается. Попробуйте еще раз.\n", operacion)
+		fmt.Printf("Ошибка: '%s' не поддерживается. Попробуйте еще раз.\n", operation)
 
 	}
 

@@ -1,3 +1,3 @@
-module 1_converter
+module go-dz
 
 go 1.25.5

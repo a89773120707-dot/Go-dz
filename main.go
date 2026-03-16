@@ -93,7 +93,7 @@ func inputTo(from string) string {
 		if lowerTo == "usd" || lowerTo == "eur" || lowerTo == "rub" {
 			return lowerTo
 		}
-		fmt.Println("Введите праивльное название валюты !")
+		fmt.Println("Введите правильное название валюты !")
 		continue
 	}
 }
@@ -121,7 +121,7 @@ func inputFrom() string {
 		if lowerFrom == "usd" || lowerFrom == "eur" || lowerFrom == "rub" {
 			return lowerFrom
 		}
-		fmt.Println("Введите праивльное название валюты !")
+		fmt.Println("Введите правильное название валюты !")
 		continue
 	}
 

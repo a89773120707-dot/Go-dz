@@ -13,8 +13,8 @@ func main() {
 	fmt.Println("=== Калькулятор Go v1.0 ===")
 	for {
 		operacion := inputOperacion()
-		number := inputNum()
-		result := calculator(operacion, number)
+		nums := inputNum()
+		result := calculator(operacion, nums)
 		fmt.Println("Результат:", result)
 		if checkRepeat() {
 			continue
@@ -24,6 +24,39 @@ func main() {
 	}
 
 }
+
+func calculator(operacion string, nums []float64) float64 {
+	type Calculation func(nums []float64) float64
+	var resault float64
+	n := len(nums)
+	menuOperation := map[string]Calculation{
+		"SUM": func(nums []float64) float64 {
+			for _, num := range nums {
+				resault += num
+			}
+			return resault
+		},
+		"AVG": func(nums []float64) float64 {
+			for _, num := range nums {
+				resault += num
+			}
+			return resault / float64(n)
+		},
+		"MED": func(nums []float64) float64 {
+			n := len(nums)
+			if n == 0 {
+				return 0
+			}
+			sort.Float64s(nums)
+			if n%2 != 0 {
+				return nums[n/2]
+			}
+			return (nums[n/2-1] + nums[n/2]) / 2
+		},
+	}
+	return menuOperation[operacion](nums)
+}
+
 func checkRepeat() bool {
 	scanner := bufio.NewScanner(os.Stdin)
 	fmt.Println("Хотите продолжить(y/n): ")
@@ -34,30 +67,6 @@ func checkRepeat() bool {
 	}
 	return true
 }
-func calculator(operacion string, number []float64) float64 {
-	var resault float64
-	n := len(number)
-	switch operacion {
-	case "SUM":
-		for _, num := range number {
-			resault += num
-		}
-		return resault
-	case "AVG":
-		for _, num := range number {
-			resault += num
-		}
-		return resault / float64(n)
-	case "MED":
-		sort.Float64s(number)
-		if n%2 != 0 {
-			return number[n/2]
-		}
-		return (number[n/2-1] + number[n/2]) / 2
-	}
-	return 0
-}
-
 func inputOperacion() string {
 
 	scanner := bufio.NewScanner(os.Stdin)
@@ -99,7 +108,7 @@ func inputNum() []float64 {
 		parts := strings.FieldsFunc(input, func(r rune) bool {
 			return r == ',' || r == ' '
 		})
-		numbers := make([]float64, 0, len(parts))
+		numss := make([]float64, 0, len(parts))
 
 		for _, numStr := range parts {
 			num, err := strconv.ParseFloat(numStr, 64)
@@ -108,17 +117,17 @@ func inputNum() []float64 {
 				flagError = true
 				break
 			}
-			numbers = append(numbers, num)
+			numss = append(numss, num)
 		}
 
 		if flagError {
 			fmt.Println("Попробуйте снова ...\n")
 			continue
 		}
-		if len(numbers) == 0 {
+		if len(numss) == 0 {
 			fmt.Println("Вы не ввели ни одного числа\n")
 			continue
 		}
-		return numbers
+		return numss
 	}
 }

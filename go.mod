@@ -1,3 +1,3 @@
-module 1_converter
+module 2-calc
 
 go 1.25.5

@@ -1,7 +1,9 @@
 package main
 
 import (
+	"3-bin_manager/api"
 	"3-bin_manager/bin"
+	"3-bin_manager/config"
 	"3-bin_manager/file"
 	"3-bin_manager/storage"
 	"fmt"
@@ -56,4 +58,16 @@ func main() {
 		return
 	}
 	storage.Print(list, isArry)
+
+	//Config
+	cfg, err := config.NewConfig()
+	if err != nil {
+		fmt.Println("Config error: ", err)
+		return
+	}
+	// Api
+	api := api.NewApi(cfg)
+	_ = api
+	fmt.Println(cfg.Key)
+
 }

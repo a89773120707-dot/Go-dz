@@ -1,77 +1,100 @@
 package storage
 
 import (
+	"3-bin_manager/file"
 	"encoding/json"
 	"fmt"
-	"math/rand"
+	"math/rand/v2"
 	"os"
 	"time"
 )
 
-type Bin struct {
-	Bin       []byte    `json:"bin"`
-	FileName  string    `json:"filename"`
-	Timestamp time.Time `json:"timestamp"`
+type BinStorage struct {
+	Bin       []byte          `json:"bin"`
+	FileName  string          `json:"filename"`
+	Timestamp time.Time       `json:"timestamp"`
+	Fs        file.FileSystem `json:"-"`
 }
 
-func NewBin(filename string) (*Bin, error) {
-	databin, err := os.ReadFile(filename)
+func NewBinStorage(filename string, fs file.FileSystem) (*BinStorage, error) {
+	data, err := fs.Read(filename)
 	if err != nil {
-		fmt.Println("Error read file")
-		return nil, err
+		return nil, fmt.Errorf("Error read file: %v", err)
 	}
-
-	bin := &Bin{
-		Bin:       databin,
-		FileName:  fmt.Sprintf("test_%d.bin", rand.Intn(1000)),
+	binStorage := &BinStorage{
+		Bin:       data,
+		FileName:  fmt.Sprintf("test_%d.json", rand.IntN(100)),
 		Timestamp: time.Now(),
+		Fs:        fs,
 	}
-
-	return bin, nil
+	return binStorage, nil
 }
 
-func (b *Bin) ReadBin(filename string) error {
-	databyte, err := os.ReadFile(filename)
+func (b *BinStorage) Readbin(filename string) error {
+	data, err := b.Fs.Read(b.FileName)
 	if err != nil {
-		return fmt.Errorf("Error read bin")
+		return err
 	}
-
-	if err := json.Unmarshal(databyte, b); err != nil {
-		return fmt.Errorf("error convert to json")
+	if err := json.Unmarshal(data, b); err != nil {
+		return err
 	}
-
 	if err := os.WriteFile("restored_"+b.FileName, b.Bin, 0644); err != nil {
-		return fmt.Errorf("Error write file")
+		return err
 	}
-	fmt.Println("good write ")
 	return nil
 }
-func (b *Bin) ReadBinList(filename string) ([]Bin, error) {
-	data, err := os.ReadFile(filename)
+
+func (b *BinStorage) SaveBinStorage(filename string) error {
+	data, err := json.Marshal(b)
 	if err != nil {
-		return nil, err
+		return err
 	}
-
-	var bins []Bin
-
-	if err := json.Unmarshal(data, &bins); err != nil {
-		return nil, err
+	if err := os.WriteFile(filename, data, 0644); err != nil {
+		return err
 	}
-	return bins, nil
+	return nil
+
 }
 
-func (b *Bin) SaveBin(filename string) {
-
-	file, err := json.Marshal(b)
+func ReadBinList(filename string, fs file.FileSystem) ([]BinStorage, bool, error) {
+	data, err := fs.Read(filename)
 	if err != nil {
-		fmt.Println("Error convert bin to json")
+		return nil, false, err
+	}
+
+	var binstorage []BinStorage
+
+	if err := json.Unmarshal(data, &binstorage); err != nil {
+
+		var single BinStorage
+		if err2 := json.Unmarshal(data, &single); err2 != nil {
+			return nil, false, fmt.Errorf("JSON parse error: %v", err2)
+		}
+
+		return []BinStorage{single}, false, nil
+	}
+
+	return binstorage, true, nil
+}
+
+func Print(list []BinStorage, isArry bool) {
+	if len(list) == 0 {
+
+		fmt.Println("Empty")
 		return
 	}
 
-	if err := os.WriteFile(filename, file, 0644); err != nil {
-		fmt.Println("Error write file")
-		return
+	if isArry {
+		for i, v := range list {
+			fmt.Printf("=== Массив (%d элементов) ===\n", len(list))
+			fmt.Printf("[%d] %s | %d bytes\n", i+1, v.FileName, len(v.Bin))
+		}
+	} else {
+		v := list[0]
+		fmt.Printf("=== Одиночный файл ===\n")
+		fmt.Printf("Timestamp: %s\n", v.Timestamp.Format("2006-01-02 15:04:05"))
+		fmt.Printf("Bin size: %d bytes\n", len(v.Bin))
+		fmt.Printf("Content: %s\n", string(v.Bin))
 	}
 
-	fmt.Println("Good")
 }

@@ -3,7 +3,10 @@ package file
 import (
 	"3-bin_manager/bin"
 	"encoding/json"
+	"fmt"
+	"os"
 	"path/filepath"
+	"strings"
 )
 
 type FileBinRepository struct {
@@ -14,7 +17,7 @@ type FileBinRepository struct {
 func NewFileBinRepository(fs FileSystem, dir string) *FileBinRepository {
 	return &FileBinRepository{
 		fs:  fs,
-		dir:  dir,
+		dir: dir,
 	}
 }
 func (f *FileBinRepository) filepath(id string) string {
@@ -45,4 +48,29 @@ func (f *FileBinRepository) Load(id string) (*bin.Bin, error) {
 		return nil, err
 	}
 	return &b, nil
+}
+
+func (f *FileBinRepository) LoadAll() ([]bin.Bin, error) {
+	entries, err := os.ReadDir(f.dir)
+	if err != nil {
+		if os.IsNotExist(err) {
+			if mkErr := os.MkdirAll(f.dir, 0755); mkErr != nil {
+				return nil, fmt.Errorf("failed to create dir: %w", mkErr)
+			}
+			return []bin.Bin{}, nil
+		}
+		return nil, err
+	}
+
+	var bins []bin.Bin
+
+	for _, entry := range entries {
+		id := strings.TrimSuffix(entry.Name(), ".json")
+		b, err := f.Load(id)
+		if err != nil {
+			return nil, fmt.Errorf("failed to load %s: %w", id, err)
+		}
+		bins = append(bins, *b)
+	}
+	return bins, nil
 }

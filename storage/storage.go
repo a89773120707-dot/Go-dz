@@ -98,3 +98,5 @@ func Print(list []BinStorage, isArry bool) {
 	}
 
 }
+
+

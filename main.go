@@ -29,7 +29,7 @@ func main() {
 	//flag
 	create := flag.Bool("create", false, "Создать бин из файла (указать путь к JSON файлу)")
 	update := flag.Bool("update", false, "Обновить бин по ID (указать ID)")
-	deleteD := flag.Bool("deleted", false, "Удалить бин по ID (указать ID)")
+	deleteFlag := flag.Bool("delete", false, "Удалить бин по ID (указать ID)")
 	get := flag.Bool("get", false, "Получить бин по ID (указать ID)")
 	list := flag.Bool("list", false, "Вывести список всех бинов")
 
@@ -59,6 +59,7 @@ func main() {
 		bins := store.ListBin()
 		if len(bins) == 0 {
 			fmt.Println("Нет Сохраненных Бинов")
+			return
 		}
 		fmt.Println("Сохранённые бины:")
 		for i, b := range bins {
@@ -135,19 +136,23 @@ func main() {
 		fmt.Println(string(data))
 
 	//delete
-	case *deleteD:
+	case *deleteFlag:
 		if *id == "" {
 			fmt.Println("Ошибка: укажите --id ID бина")
 			os.Exit(1)
 		}
-
+		if err := store.Load(); err != nil {
+			fmt.Printf("Ошибка загрузки: %v\n", err)
+			os.Exit(1)
+		}
 		if err := apiClient.DeleteBin(*id); err != nil {
 			fmt.Printf("Ошибка удаления из JsonBin: %v\n", err)
 			os.Exit(1)
 		}
 
 		if err := store.DeletBin(*id); err != nil {
-			fmt.Printf("Локально бин не найден, но удалён из JsonBin: %v\n", err)
+			fmt.Printf("Ошибка локального удаления: %v\n", err)
+			os.Exit(1)
 		}
 		if err := store.Save(); err != nil {
 			fmt.Printf("Ошибка сохранения: %v\n", err)

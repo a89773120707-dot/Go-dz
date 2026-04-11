@@ -121,20 +121,23 @@ func (c *Client) UpdateBin(binID string, data map[string]interface{}) (string, e
 		return "", fmt.Errorf("ошибка соединения: %w", err)
 	}
 
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", fmt.Errorf("ошибка чтения ответа: %w", err)
+	}
+
 	var result struct {
 		Metadata struct {
 			ID string `json:"id"`
 		} `json:"metadata"`
 	}
 
-	dec := json.NewDecoder(resp.Body)
-	dec.DisallowUnknownFields()
-	if err := dec.Decode(&result); err != nil {
+	if err := json.Unmarshal(body, &result); err != nil {
 		return "", fmt.Errorf("Ошибка декодирования: %w", err)
 	}
 
 	if result.Metadata.ID == "" {
-		return "", fmt.Errorf("сервер не вернул ID бина")
+		return binID, nil
 	}
 	return result.Metadata.ID, nil
 }
@@ -173,10 +176,6 @@ func (c *Client) setHeders(req *http.Request, contentType bool) {
 }
 
 func (c *Client) checkResponse(resp *http.Response) error {
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return fmt.Errorf("чтение тела ответа: %w", err)
-	}
 
 	switch resp.StatusCode {
 	case 200, 201, 204:
@@ -193,6 +192,6 @@ func (c *Client) checkResponse(resp *http.Response) error {
 		if resp.StatusCode >= 500 {
 			return fmt.Errorf("ошибка сервера JsonBin (%d)", resp.StatusCode)
 		}
-		return fmt.Errorf("ошибка: %s", string(body))
+		return fmt.Errorf("ошибка JsonBin: статус %d", resp.StatusCode)
 	}
 }

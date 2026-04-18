@@ -1,0 +1,23 @@
+# Исполняемые файлы
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Временные файлы
+*.tmp
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+test.bin
+*.json
+
+.env*
